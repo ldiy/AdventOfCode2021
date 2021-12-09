@@ -55,32 +55,31 @@ function calc_basin(&$map, $x, $y) : int
     return $size;
 }
 
-function part1($map): int
+function part1($map, &$low_points): int
 {
     $result = 0;
+    $low_points = [];
     for ($y = 0; $y < count($map); $y++)
         for ($x = 0; $x < count($map[0]); $x++)
-            if(check_neighbours($map, $x, $y))
+            if(check_neighbours($map, $x, $y)) {
+                array_push($low_points, [$x, $y]);
                 $result += $map[$y][$x] + 1;
+            }
 
     return $result;
 }
 
-function part2($map): int
+function part2($map, &$low_points): int
 {
     $sizes = [];
-    for ($y = 0; $y < count($map); $y++) {
-        for ($x = 0; $x < count($map[0]); $x++) {
-            $size = calc_basin($map, $x, $y);
-            if($size != 0) {
-                array_push($sizes, $size);
-            }
-        }
+    foreach ($low_points as $low_point) {
+        array_push($sizes, calc_basin($map, $low_point[0], $low_point[1]));
     }
     rsort($sizes);
     return $sizes[0] * $sizes[1] * $sizes[2];
 }
 
 $parsed = parse_input();
-echo "Part 1: " . part1($parsed) . PHP_EOL;
-echo "Part 2: " . part2($parsed) . PHP_EOL;
+$low_points = [];
+echo "Part 1: " . part1($parsed, $low_points) . PHP_EOL;
+echo "Part 2: " . part2($parsed, $low_points) . PHP_EOL;
