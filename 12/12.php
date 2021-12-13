@@ -29,6 +29,8 @@ function parse_input(): array
     return $parsed;
 }
 
+$web = parse_input();
+
 function find_paths(&$web, $node, $visited=[]): int
 {
     if ($node == 'end')
@@ -48,9 +50,16 @@ function find_paths(&$web, $node, $visited=[]): int
     return $number_of_paths;
 }
 
-
-function find_paths_2(&$web, $node, $visited=[], $visited_twice=false): int
+function find_paths_2($node, $visited=[], $visited_twice=false): int
 {
+    global $web;
+    static $cache = [];
+    $key = serialize(func_get_args());
+
+    if (isset($cache[$key])) {
+        return $cache[$key];
+    }
+
     if ($node == 'end')
         return 1;
 
@@ -68,8 +77,11 @@ function find_paths_2(&$web, $node, $visited=[], $visited_twice=false): int
     $adj_nodes = $web[$node];
     $number_of_paths = 0;
     foreach ($adj_nodes as $adj_node) {
-        $number_of_paths += find_paths_2($web, $adj_node, $visited, $visited_twice);
+        $number_of_paths += find_paths_2($adj_node, $visited, $visited_twice);
     }
+
+    $cache[$key] = $number_of_paths;
+
 
     return $number_of_paths;
 }
@@ -81,9 +93,9 @@ function part1($web): int
 
 function part2($web): int
 {
-    return find_paths_2($web, 'start');
+    return find_paths_2('start');
 }
 
-$parsed = parse_input();
-echo "Part 1: " . part1($parsed) . PHP_EOL;
-echo "Part 2: " . part2($parsed) . PHP_EOL;
+
+echo "Part 1: " . part1($web) . PHP_EOL;
+echo "Part 2: " . part2($web) . PHP_EOL;
